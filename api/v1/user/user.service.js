@@ -2,6 +2,7 @@ const User = require('./user.model');
 const { generateTokens, verifyRefreshToken } = require('../../../helpers/token');
 const MESSAGES = require('../../../constants/messages');
 const ROLES = require('../../../constants/roles');
+const RESPONSE_TAGS = require('../../../constants/responseTags');
 const { createNotFoundError, createConflictError, createUnauthorizedError } = require('../../../middlewares/error.middleware');
 const logger = require('../../../helpers/logger');
 
@@ -19,7 +20,7 @@ const userService = {
       // Check if user already exists
       const existingUser = await User.findByEmail(userData.email);
       if (existingUser) {
-        throw createConflictError(MESSAGES.ERROR.USER_ALREADY_EXISTS);
+        throw createConflictError(MESSAGES.ERROR.USER_ALREADY_EXISTS, RESPONSE_TAGS.RESOURCE.USER_ALREADY_EXISTS);
       }
 
       // Create new user
@@ -49,18 +50,18 @@ const userService = {
       // Find user by email and include password
       const user = await User.findByEmail(email).select('+password');
       if (!user) {
-        throw createUnauthorizedError(MESSAGES.ERROR.INVALID_CREDENTIALS);
+        throw createUnauthorizedError(MESSAGES.ERROR.INVALID_CREDENTIALS, RESPONSE_TAGS.AUTH.INVALID_CREDENTIALS);
       }
 
       // Check if user is active
       if (!user.isActive) {
-        throw createUnauthorizedError('Account is deactivated');
+        throw createUnauthorizedError('Account is deactivated', RESPONSE_TAGS.AUTH.FORBIDDEN);
       }
 
       // Verify password
       const isPasswordValid = await user.comparePassword(password);
       if (!isPasswordValid) {
-        throw createUnauthorizedError(MESSAGES.ERROR.INVALID_CREDENTIALS);
+        throw createUnauthorizedError(MESSAGES.ERROR.INVALID_CREDENTIALS, RESPONSE_TAGS.AUTH.INVALID_CREDENTIALS);
       }
 
       // Generate tokens
@@ -107,12 +108,12 @@ const userService = {
       // Find user
       const user = await User.findById(decoded.userId);
       if (!user) {
-        throw createUnauthorizedError(MESSAGES.ERROR.REFRESH_TOKEN_INVALID);
+        throw createUnauthorizedError(MESSAGES.ERROR.REFRESH_TOKEN_INVALID, RESPONSE_TAGS.AUTH.REFRESH_TOKEN_INVALID);
       }
 
       // Check if user is active
       if (!user.isActive) {
-        throw createUnauthorizedError('Account is deactivated');
+        throw createUnauthorizedError('Account is deactivated', RESPONSE_TAGS.AUTH.FORBIDDEN);
       }
 
       // Generate new tokens
@@ -146,7 +147,7 @@ const userService = {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND);
+        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND, RESPONSE_TAGS.RESOURCE.USER_NOT_FOUND);
       }
 
       // Remove password from response
@@ -242,14 +243,14 @@ const userService = {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND);
+        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND, RESPONSE_TAGS.RESOURCE.USER_NOT_FOUND);
       }
 
       // Check if email is being updated and if it already exists
       if (updateData.email && updateData.email !== user.email) {
         const existingUser = await User.findByEmail(updateData.email);
         if (existingUser) {
-          throw createConflictError(MESSAGES.ERROR.USER_ALREADY_EXISTS);
+          throw createConflictError(MESSAGES.ERROR.USER_ALREADY_EXISTS, RESPONSE_TAGS.RESOURCE.USER_ALREADY_EXISTS);
         }
       }
 
@@ -277,7 +278,7 @@ const userService = {
     try {
       const user = await User.findById(userId);
       if (!user) {
-        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND);
+        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND, RESPONSE_TAGS.RESOURCE.USER_NOT_FOUND);
       }
 
       await User.findByIdAndDelete(userId);
@@ -299,13 +300,13 @@ const userService = {
     try {
       const user = await User.findById(userId).select('+password');
       if (!user) {
-        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND);
+        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND, RESPONSE_TAGS.RESOURCE.USER_NOT_FOUND);
       }
 
       // Verify current password
       const isCurrentPasswordValid = await user.comparePassword(currentPassword);
       if (!isCurrentPasswordValid) {
-        throw createUnauthorizedError('Current password is incorrect');
+        throw createUnauthorizedError('Current password is incorrect', RESPONSE_TAGS.AUTH.INVALID_CREDENTIALS);
       }
 
       // Update password

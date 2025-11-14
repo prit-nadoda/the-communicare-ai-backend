@@ -5,18 +5,20 @@ A comprehensive Node.js MongoDB backend boilerplate with JWT authentication, RBA
 ## 🚀 Features
 
 - **JWT Authentication** - Access token + Refresh token flow
-- **Role-Based Access Control (RBAC)** - User, Moderator, Admin roles
+- **Role-Based Access Control (RBAC)** - Patient, Professional, Admin roles
+- **Response Tags** - Programmatic response identification for client-side handling
 - **MongoDB Integration** - Mongoose ODM with optimized schemas
 - **Input Validation** - Joi schema validation
 - **Security Middleware** - Helmet, CORS, XSS protection, NoSQL injection prevention
 - **Rate Limiting** - Express rate limiting on auth endpoints
 - **File Upload** - Multer-based file upload with validation
 - **Logging** - Winston logger with file and console output
-- **Error Handling** - Global error handler with custom error classes
+- **Error Handling** - Global error handler with custom error factory functions
 - **API Documentation** - Swagger UI with comprehensive documentation
 - **Health Check** - Server health monitoring endpoint
 - **Pagination & Filtering** - Built-in pagination, search, and filtering
-- **Standardized Responses** - Consistent API response format
+- **Standardized Responses** - Consistent API response format with tags
+- **Database Seeding** - Automated default admin user creation
 
 ## 📁 Project Structure
 
@@ -38,7 +40,8 @@ project/
 ├── constants/
 │   ├── messages.js
 │   ├── httpCodes.js
-│   └── roles.js
+│   ├── roles.js
+│   └── responseTags.js
 │
 ├── middlewares/
 │   ├── auth.middleware.js
@@ -54,9 +57,11 @@ project/
 │   ├── uploader.js
 │   └── sanitizer.js
 │
+├── scripts/
+│   └── seed.js
 ├── uploads/
 ├── docs/
-│   └── swagger.yaml
+│   └── swagger.json
 ├── logs/
 ├── .env
 ├── app.js
@@ -87,7 +92,17 @@ project/
    # Make sure MongoDB is running locally or update MONGODB_URI in .env
    ```
 
-5. **Run the application**
+5. **Seed the database (optional)**
+   ```bash
+   # Create default admin user
+   npm run db:seed
+   
+   # Default credentials:
+   # Email: admin@yopmail.com
+   # Password: Admin@123
+   ```
+
+6. **Run the application**
    ```bash
    # Development
    npm run dev
@@ -224,8 +239,8 @@ npm run test:coverage
 ```bash
 npm start          # Start production server
 npm run dev        # Start development server with nodemon
+npm run db:seed    # Seed database with default admin user
 npm test           # Run tests
-npm run lint       # Run linter (when configured)
 ```
 
 ## 🚀 Deployment

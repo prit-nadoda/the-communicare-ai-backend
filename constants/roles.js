@@ -1,12 +1,12 @@
 const ROLES = {
-  USER: 'user',
+  PATIENT: 'patient',
+  PROFESSIONAL: 'professional',
   ADMIN: 'admin',
-  MODERATOR: 'moderator',
 };
 
 const ROLE_HIERARCHY = {
-  [ROLES.USER]: 1,
-  [ROLES.MODERATOR]: 2,
+  [ROLES.PATIENT]: 1,
+  [ROLES.PROFESSIONAL]: 2,
   [ROLES.ADMIN]: 3,
 };
 

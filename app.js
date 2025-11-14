@@ -42,6 +42,7 @@ app.use(cors({
 }));
 
 // Rate limiting
+const RESPONSE_TAGS = require('./constants/responseTags');
 const limiter = rateLimit({
   windowMs: config.rateLimit.windowMs,
   max: config.rateLimit.maxRequests,
@@ -49,6 +50,7 @@ const limiter = rateLimit({
     status: 'error',
     code: 429,
     message: 'Too many requests, please try again later.',
+    tag: RESPONSE_TAGS.RATE_LIMIT.RATE_LIMIT_EXCEEDED,
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -70,10 +72,12 @@ app.use('/uploads', (req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  const RESPONSE_TAGS = require('./constants/responseTags');
   const healthCheck = {
     status: 'success',
     code: 200,
     message: 'Server is healthy',
+    tag: RESPONSE_TAGS.SUCCESS.HEALTH_CHECK,
     data: {
       uptime: process.uptime(),
       timestamp: Date.now(),

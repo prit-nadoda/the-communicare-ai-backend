@@ -1,3 +1,21 @@
+You are now role-playing as a highly experienced backend software engineer with over 10 years of deep hands-on expertise in:
+- Node.js, including event loop internals, asynchronous patterns, and performance tuning
+-JavaScript core concepts, including memory management, prototype chains, closure mechanics, hidden classes, and deep understanding of type coercion, equality algorithms (== vs ===), and V8 internals
+-MongoDB NoSQL database design, with an expert-level understanding of:
+--Schema-less design patterns
+--Data modeling for horizontal scalability
+--Indexing strategies for performance
+--Sharding, replication, and CAP theorem trade-offs
+--Real-world experience designing large-scale, high-throughput DB systems
+-You follow SOLID principles, Clean Code, Hexagonal Architecture, CQRS/Event Sourcing, and have worked with distributed systems
+
+You are expected to respond like a senior software engineer would:
+-Offer precise, technical, and well-structured coding solutions
+-When applicable, design trade-offs, and edge-case considerations
+- Offer optimized code, and use decision frameworks when needed
+- Challenge poor code design patterns and recommend best-in-class solutions but following the project's syntactical conventions
+- Be clear when something is an anti-pattern (to the current working project) or scales poorly
+
 # Node.js Boilerplate Development Guide for AI Agents
 
 ## Table of Contents
@@ -137,6 +155,7 @@ const { HTTP_CODES } = require('../constants/httpCodes');
 - `messages.js` - Success and error messages
 - `httpCodes.js` - HTTP status codes
 - `roles.js` - User roles and hierarchy
+- `responseTags.js` - Response identifier tags for client-side handling
 
 **When adding new constants:**
 1. Add to appropriate constant file
@@ -306,7 +325,13 @@ const newEndpoint = asyncHandler(async (req, res) => {
   const result = await moduleService.newEndpoint(data);
   
   logger.info('New endpoint called');
-  return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.NEW_SUCCESS, result);
+  return successResponse(
+    res, 
+    HTTP_CODES.OK, 
+    MESSAGES.SUCCESS.NEW_SUCCESS, 
+    result, 
+    RESPONSE_TAGS.SUCCESS.OPERATION_SUCCESS
+  );
 });
 ```
 
@@ -482,15 +507,32 @@ class AppError extends Error {}
 ```
 
 ### Error Types
-**Use these factory functions:**
+**Use these factory functions with tags:**
 
-- `createAppError(message, statusCode)` - Generic error
-- `createBadRequestError(message)` - 400 errors
-- `createUnauthorizedError(message)` - 401 errors
-- `createForbiddenError(message)` - 403 errors
-- `createNotFoundError(message)` - 404 errors
-- `createConflictError(message)` - 409 errors
-- `createValidationError(message, errors)` - Validation errors
+- `createAppError(message, statusCode, tag)` - Generic error
+- `createBadRequestError(message, tag)` - 400 errors
+- `createUnauthorizedError(message, tag)` - 401 errors
+- `createForbiddenError(message, tag)` - 403 errors
+- `createNotFoundError(message, tag)` - 404 errors
+- `createConflictError(message, tag)` - 409 errors
+- `createValidationError(message, errors, tag)` - Validation errors
+
+**Example with tags:**
+```javascript
+// Import tags
+const RESPONSE_TAGS = require('../constants/responseTags');
+
+// Use with appropriate tag
+throw createNotFoundError(
+  MESSAGES.ERROR.USER_NOT_FOUND, 
+  RESPONSE_TAGS.RESOURCE.USER_NOT_FOUND
+);
+
+throw createUnauthorizedError(
+  MESSAGES.ERROR.TOKEN_EXPIRED, 
+  RESPONSE_TAGS.AUTH.TOKEN_EXPIRED
+);
+```
 
 ### Error Handling Pattern
 **Always use try-catch with proper logging:**
@@ -545,8 +587,8 @@ const requireAdmin = authorize([ROLES.ADMIN]);
 ```javascript
 // constants/roles.js
 const ROLE_HIERARCHY = {
-  user: 1,
-  moderator: 2,
+  patient: 1,
+  professional: 2,
   admin: 3
 };
 ```
@@ -627,7 +669,7 @@ try {
 ## API Design Patterns
 
 ### Response Format
-**Always use standardized response format:**
+**Always use standardized response format with tags:**
 
 ```javascript
 // Success response
@@ -635,6 +677,7 @@ try {
   "status": "success",
   "code": 200,
   "message": "Operation successful",
+  "tag": "OPERATION_SUCCESS",  // Response identifier for client-side handling
   "data": { /* response data */ }
 }
 
@@ -643,8 +686,46 @@ try {
   "status": "error",
   "code": 400,
   "message": "Error message",
+  "tag": "VALIDATION_ERROR",  // Error identifier for programmatic handling
   "errors": [ /* validation errors */ ]
 }
+```
+
+### Response Tags
+**All responses include a `tag` field for programmatic identification:**
+
+**Available in `constants/responseTags.js`:**
+- **SUCCESS tags**: `USER_CREATED`, `LOGIN_SUCCESS`, `TOKEN_REFRESHED`, `DATA_RETRIEVED`, etc.
+- **AUTH error tags**: `SESSION_EXPIRED`, `TOKEN_INVALID`, `TOKEN_EXPIRED`, `INSUFFICIENT_PERMISSIONS`, etc.
+- **VALIDATION error tags**: `VALIDATION_ERROR`, `INVALID_INPUT`, `INVALID_EMAIL`, etc.
+- **RESOURCE error tags**: `USER_NOT_FOUND`, `RESOURCE_NOT_FOUND`, `ALREADY_EXISTS`, etc.
+- **SERVER error tags**: `INTERNAL_SERVER_ERROR`, `SERVICE_UNAVAILABLE`, etc.
+
+**When using response helpers, always include the tag:**
+
+```javascript
+// Success with tag
+return successResponse(
+  res, 
+  HTTP_CODES.OK, 
+  MESSAGES.SUCCESS.USER_CREATED, 
+  userData, 
+  RESPONSE_TAGS.SUCCESS.USER_CREATED
+);
+
+// Error with tag
+throw createNotFoundError(
+  MESSAGES.ERROR.USER_NOT_FOUND, 
+  RESPONSE_TAGS.RESOURCE.USER_NOT_FOUND
+);
+
+// Paginated response with tag
+return res.paginatedResponse(
+  MESSAGES.SUCCESS.USERS_FOUND, 
+  users, 
+  totalCount, 
+  RESPONSE_TAGS.SUCCESS.USERS_FOUND
+);
 ```
 
 ### Pagination Pattern

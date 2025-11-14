@@ -289,7 +289,7 @@
             "description": "Filter by role",
             "schema": {
               "type": "string",
-              "enum": ["user", "moderator", "admin"]
+              "enum": ["patient", "professional", "admin"]
             }
           },
           {
@@ -493,6 +493,11 @@
             "type": "string",
             "example": "Server is healthy"
           },
+          "tag": {
+            "type": "string",
+            "example": "HEALTH_CHECK",
+            "description": "Response identifier tag for programmatic handling"
+          },
           "data": {
             "type": "object",
             "properties": {
@@ -538,9 +543,9 @@
           },
           "role": {
             "type": "string",
-            "enum": ["user", "moderator", "admin"],
-            "default": "user",
-            "example": "user"
+            "enum": ["patient", "professional", "admin"],
+            "default": "patient",
+            "example": "patient"
           }
         }
       },
@@ -573,6 +578,11 @@
           "message": {
             "type": "string",
             "example": "Login successful"
+          },
+          "tag": {
+            "type": "string",
+            "example": "LOGIN_SUCCESS",
+            "description": "Response identifier tag for programmatic handling"
           },
           "data": {
             "type": "object",
@@ -616,6 +626,11 @@
           "message": {
             "type": "string",
             "example": "Token refreshed successfully"
+          },
+          "tag": {
+            "type": "string",
+            "example": "TOKEN_REFRESHED",
+            "description": "Response identifier tag for programmatic handling"
           },
           "data": {
             "type": "object",
@@ -683,8 +698,8 @@
           },
           "role": {
             "type": "string",
-            "enum": ["user", "moderator", "admin"],
-            "example": "user"
+            "enum": ["patient", "professional", "admin"],
+            "example": "patient"
           },
           "isActive": {
             "type": "boolean",
@@ -714,8 +729,8 @@
           },
           "role": {
             "type": "string",
-            "enum": ["user", "moderator", "admin"],
-            "example": "user"
+            "enum": ["patient", "professional", "admin"],
+            "example": "patient"
           },
           "avatar": {
             "type": "string",
@@ -766,6 +781,11 @@
           "message": {
             "type": "string",
             "example": "Users found successfully"
+          },
+          "tag": {
+            "type": "string",
+            "example": "USERS_FOUND",
+            "description": "Response identifier tag for programmatic handling"
           },
           "data": {
             "type": "array",
@@ -819,6 +839,11 @@
             "type": "string",
             "example": "Operation successful"
           },
+          "tag": {
+            "type": "string",
+            "example": "OPERATION_SUCCESS",
+            "description": "Response identifier tag for programmatic handling"
+          },
           "data": {
             "type": "object"
           }
@@ -838,6 +863,11 @@
           "message": {
             "type": "string",
             "example": "Error message"
+          },
+          "tag": {
+            "type": "string",
+            "example": "VALIDATION_ERROR",
+            "description": "Response identifier tag for programmatic error handling"
           },
           "errors": {
             "type": "array",

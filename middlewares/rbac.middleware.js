@@ -71,19 +71,19 @@ const requireMinimumRole = (minimumRole) => {
 const requireAdmin = authorize([ROLES.ADMIN]);
 
 /**
- * User or higher middleware
+ * Patient or higher middleware
  */
-const requireUserOrHigher = requireMinimumRole(ROLES.USER);
+const requirePatientOrHigher = requireMinimumRole(ROLES.PATIENT);
 
 /**
- * Moderator or higher middleware
+ * Professional or higher middleware
  */
-const requireModeratorOrHigher = requireMinimumRole(ROLES.MODERATOR);
+const requireProfessionalOrHigher = requireMinimumRole(ROLES.PROFESSIONAL);
 
 module.exports = {
   authorize,
   requireMinimumRole,
   requireAdmin,
-  requireUserOrHigher,
-  requireModeratorOrHigher,
+  requirePatientOrHigher,
+  requireProfessionalOrHigher,
 }; 

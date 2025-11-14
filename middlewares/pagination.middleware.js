@@ -44,7 +44,7 @@ const paginationMiddleware = (req, res, next) => {
     };
 
     // Add pagination response helper to response object
-    res.paginatedResponse = (message, data, totalCount) => {
+    res.paginatedResponse = (message, data, totalCount, tag) => {
       const totalPages = Math.ceil(totalCount / limit);
       const hasNextPage = page < totalPages;
       const hasPrevPage = page > 1;
@@ -60,7 +60,7 @@ const paginationMiddleware = (req, res, next) => {
         prevPage: hasPrevPage ? page - 1 : null,
       };
 
-      return paginationResponse(res, message, data, pagination);
+      return paginationResponse(res, message, data, pagination, tag);
     };
 
     next();

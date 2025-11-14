@@ -2,6 +2,7 @@ const userService = require('./user.service');
 const { successResponse } = require('../../../helpers/response');
 const MESSAGES = require('../../../constants/messages');
 const HTTP_CODES = require('../../../constants/httpCodes');
+const RESPONSE_TAGS = require('../../../constants/responseTags');
 const { asyncHandler } = require('../../../middlewares/error.middleware');
 const logger = require('../../../helpers/logger');
 
@@ -18,7 +19,7 @@ const userController = {
     const user = await userService.createUser(userData);
     
     logger.info(`User registration successful: ${user.email}`);
-    return successResponse(res, HTTP_CODES.CREATED, MESSAGES.SUCCESS.USER_CREATED, user);
+    return successResponse(res, HTTP_CODES.CREATED, MESSAGES.SUCCESS.USER_CREATED, user, RESPONSE_TAGS.SUCCESS.USER_CREATED);
   }),
 
   /**
@@ -30,7 +31,7 @@ const userController = {
     const result = await userService.loginUser(email, password);
     
     logger.info(`User login successful: ${result.user.email}`);
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.LOGIN_SUCCESS, result);
+    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.LOGIN_SUCCESS, result, RESPONSE_TAGS.SUCCESS.LOGIN_SUCCESS);
   }),
 
   /**
@@ -42,7 +43,7 @@ const userController = {
     const tokens = await userService.refreshToken(refreshToken);
     
     logger.info('Token refresh successful');
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.TOKEN_REFRESHED, tokens);
+    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.TOKEN_REFRESHED, tokens, RESPONSE_TAGS.SUCCESS.TOKEN_REFRESHED);
   }),
 
 
@@ -56,7 +57,7 @@ const userController = {
     const user = await userService.getUserById(userId);
     
     logger.info(`Profile retrieved: ${user.email}`);
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_FOUND, user);
+    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_FOUND, user, RESPONSE_TAGS.SUCCESS.USER_FOUND);
   }),
 
   /**
@@ -70,7 +71,7 @@ const userController = {
     const user = await userService.updateUser(userId, updateData);
     
     logger.info(`Profile updated: ${user.email}`);
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_UPDATED, user);
+    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_UPDATED, user, RESPONSE_TAGS.SUCCESS.USER_UPDATED);
   }),
 
   /**
@@ -84,7 +85,7 @@ const userController = {
     await userService.changePassword(userId, currentPassword, newPassword);
     
     logger.info(`Password changed for user: ${req.user.email}`);
-    return successResponse(res, HTTP_CODES.OK, 'Password changed successfully');
+    return successResponse(res, HTTP_CODES.OK, 'Password changed successfully', null, RESPONSE_TAGS.SUCCESS.USER_UPDATED);
   }),
 
   /**
@@ -96,7 +97,7 @@ const userController = {
     const user = await userService.getUserById(userId);
     
     logger.info(`User retrieved by ID: ${user.email}`);
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_FOUND, user);
+    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_FOUND, user, RESPONSE_TAGS.SUCCESS.USER_FOUND);
   }),
 
   /**
@@ -116,7 +117,7 @@ const userController = {
     const result = await userService.getUsers(options);
     
     logger.info(`Users retrieved: ${result.users.length} users`);
-    return res.paginatedResponse(MESSAGES.SUCCESS.USERS_FOUND, result.users, result.pagination.totalCount);
+    return res.paginatedResponse(MESSAGES.SUCCESS.USERS_FOUND, result.users, result.pagination.totalCount, RESPONSE_TAGS.SUCCESS.USERS_FOUND);
   }),
 
   /**
@@ -130,7 +131,7 @@ const userController = {
     const user = await userService.updateUser(userId, updateData);
     
     logger.info(`User updated by admin: ${user.email}`);
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_UPDATED, user);
+    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_UPDATED, user, RESPONSE_TAGS.SUCCESS.USER_UPDATED);
   }),
 
   /**
@@ -143,7 +144,7 @@ const userController = {
     await userService.deleteUser(userId);
     
     logger.info(`User deleted by admin: ${userId}`);
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_DELETED);
+    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_DELETED, null, RESPONSE_TAGS.SUCCESS.USER_DELETED);
   }),
 };
 
