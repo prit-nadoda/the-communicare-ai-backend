@@ -2,7 +2,9 @@ const { verifyAccessToken } = require('../helpers/token');
 const { errorResponse } = require('../helpers/response');
 const MESSAGES = require('../constants/messages');
 const HTTP_CODES = require('../constants/httpCodes');
+const { ROLES } = require('../constants/roles');
 const logger = require('../helpers/logger');
+const Patient = require('../api/v1/patient/patient.model');
 
 /**
  * Authentication middleware
@@ -28,7 +30,19 @@ const authenticate = async (req, res, next) => {
     // Attach user to request
     req.user = decoded;
     
-    logger.info(`User authenticated: ${decoded.userId}`);
+    // Add role-specific context
+    if (decoded.role === ROLES.PATIENT) {
+      try {
+        const patient = await Patient.findOne({ user: decoded.userId }).select('_id');
+        if (patient) {
+          req.patientId = patient._id.toString();
+        }
+      } catch (error) {
+        logger.error('Error fetching patient context:', error);
+      }
+    }
+    
+    logger.info(`User authenticated: ${decoded.userId} (${decoded.role})`);
     next();
   } catch (error) {
     logger.error('Authentication error:', error);
@@ -69,7 +83,19 @@ const optionalAuth = async (req, res, next) => {
     // Attach user to request
     req.user = decoded;
     
-    logger.info(`Optional user authenticated: ${decoded.userId}`);
+    // Add role-specific context
+    if (decoded.role === ROLES.PATIENT) {
+      try {
+        const patient = await Patient.findOne({ user: decoded.userId }).select('_id');
+        if (patient) {
+          req.patientId = patient._id.toString();
+        }
+      } catch (error) {
+        logger.error('Error fetching patient context:', error);
+      }
+    }
+    
+    logger.info(`Optional user authenticated: ${decoded.userId} (${decoded.role})`);
     next();
   } catch (error) {
     logger.warn('Optional authentication failed:', error);

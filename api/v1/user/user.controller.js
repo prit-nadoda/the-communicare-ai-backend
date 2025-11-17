@@ -11,18 +11,6 @@ const logger = require('../../../helpers/logger');
  */
 const userController = {
   /**
-   * Register a new user
-   * POST /api/v1/user/register
-   */
-  register: asyncHandler(async (req, res) => {
-    const userData = req.body;
-    const user = await userService.createUser(userData);
-    
-    logger.info(`User registration successful: ${user.email}`);
-    return successResponse(res, HTTP_CODES.CREATED, MESSAGES.SUCCESS.USER_CREATED, user, RESPONSE_TAGS.SUCCESS.USER_CREATED);
-  }),
-
-  /**
    * Login user
    * POST /api/v1/user/login
    */

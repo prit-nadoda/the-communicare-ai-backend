@@ -9,7 +9,6 @@ const { paginationMiddleware, filterMiddleware, searchMiddleware } = require('..
 const router = express.Router();
 
 // Public routes (no authentication required)
-router.post('/register', validateBody(userValidation.registerSchema), userController.register);
 router.post('/login', validateBody(userValidation.loginSchema), userController.login);
 router.post('/refresh-token', validateBody(userValidation.refreshTokenSchema), userController.refreshToken);
 

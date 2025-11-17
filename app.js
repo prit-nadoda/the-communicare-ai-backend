@@ -16,6 +16,10 @@ const { errorHandler, notFoundHandler, methodNotAllowedHandler } = require('./mi
 
 // Import routes
 const userRoutes = require('./api/v1/user/user.route');
+const patientRoutes = require('./api/v1/patient/patient.route');
+const chronicConditionRoutes = require('./api/v1/chronicCondition/chronicCondition.route');
+const allergyRoutes = require('./api/v1/allergy/allergy.route');
+const healthConcernRoutes = require('./api/v1/healthConcern/healthConcern.route');
 
 // Create Express app
 const app = express();
@@ -90,6 +94,10 @@ app.get('/health', (req, res) => {
 
 // API routes
 app.use('/api/v1/user', userRoutes);
+app.use('/api/v1/patient', patientRoutes);
+app.use('/api/v1/chronic-condition', chronicConditionRoutes);
+app.use('/api/v1/allergy', allergyRoutes);
+app.use('/api/v1/health-concern', healthConcernRoutes);
 
 // Swagger documentation
 try {

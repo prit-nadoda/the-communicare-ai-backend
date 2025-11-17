@@ -2,6 +2,7 @@ const Joi = require('joi');
 const { errorResponse } = require('../helpers/response');
 const MESSAGES = require('../constants/messages');
 const HTTP_CODES = require('../constants/httpCodes');
+const RESPONSE_TAGS = require('../constants/responseTags');
 const logger = require('../helpers/logger');
 
 /**
@@ -28,7 +29,8 @@ const validate = (schema, property = 'body') => {
           res,
           HTTP_CODES.BAD_REQUEST,
           MESSAGES.ERROR.VALIDATION_ERROR,
-          errorDetails
+          errorDetails,
+          RESPONSE_TAGS.VALIDATION.VALIDATION_ERROR
         );
       }
 
@@ -37,7 +39,13 @@ const validate = (schema, property = 'body') => {
       next();
     } catch (error) {
       logger.error('Validation middleware error:', error);
-      return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG);
+      return errorResponse(
+        res, 
+        HTTP_CODES.INTERNAL_SERVER_ERROR, 
+        MESSAGES.ERROR.SOMETHING_WENT_WRONG,
+        null,
+        RESPONSE_TAGS.SERVER.INTERNAL_SERVER_ERROR
+      );
     }
   };
 };

@@ -82,9 +82,12 @@ const filterMiddleware = (req, res, next) => {
   try {
     const filters = {};
 
+    // Reserved query parameters that should not be treated as filters
+    const reservedParams = ['page', 'limit', 'sortBy', 'sortOrder', 'search'];
+
     // Extract filter parameters from query
     Object.keys(req.query).forEach(key => {
-      if (!['page', 'limit', 'sortBy', 'sortOrder'].includes(key)) {
+      if (!reservedParams.includes(key)) {
         const value = req.query[key];
         
         // Handle different filter types
