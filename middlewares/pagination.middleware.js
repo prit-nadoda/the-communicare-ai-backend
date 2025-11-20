@@ -1,6 +1,7 @@
-const { successResponse, paginationResponse } = require('../helpers/response');
+const { successResponse, paginationResponse, errorResponse } = require('../helpers/response');
 const { MESSAGES } = require('../constants/messages');
 const { HTTP_CODES } = require('../constants/httpCodes');
+const RESPONSE_TAGS = require('../constants/responseTags');
 const logger = require('../helpers/logger');
 
 /**
@@ -16,19 +17,11 @@ const paginationMiddleware = (req, res, next) => {
 
     // Validate pagination parameters
     if (page < 1) {
-      return res.status(HTTP_CODES.BAD_REQUEST).json({
-        status: 'error',
-        code: HTTP_CODES.BAD_REQUEST,
-        message: 'Page must be greater than 0',
-      });
+      return errorResponse(res, HTTP_CODES.BAD_REQUEST, 'Page must be greater than 0', null, RESPONSE_TAGS.VALIDATION.INVALID_INPUT);
     }
 
     if (limit < 1 || limit > 100) {
-      return res.status(HTTP_CODES.BAD_REQUEST).json({
-        status: 'error',
-        code: HTTP_CODES.BAD_REQUEST,
-        message: 'Limit must be between 1 and 100',
-      });
+      return errorResponse(res, HTTP_CODES.BAD_REQUEST, 'Limit must be between 1 and 100', null, RESPONSE_TAGS.VALIDATION.INVALID_INPUT);
     }
 
     // Calculate skip value
@@ -66,11 +59,7 @@ const paginationMiddleware = (req, res, next) => {
     next();
   } catch (error) {
     logger.error('Pagination middleware error:', error);
-    return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
-      status: 'error',
-      code: HTTP_CODES.INTERNAL_SERVER_ERROR,
-      message: MESSAGES.ERROR.SOMETHING_WENT_WRONG,
-    });
+    return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG, null, RESPONSE_TAGS.SERVER.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -108,11 +97,7 @@ const filterMiddleware = (req, res, next) => {
     next();
   } catch (error) {
     logger.error('Filter middleware error:', error);
-    return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
-      status: 'error',
-      code: HTTP_CODES.INTERNAL_SERVER_ERROR,
-      message: MESSAGES.ERROR.SOMETHING_WENT_WRONG,
-    });
+    return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG, null, RESPONSE_TAGS.SERVER.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -131,11 +116,7 @@ const searchMiddleware = (req, res, next) => {
     next();
   } catch (error) {
     logger.error('Search middleware error:', error);
-    return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({
-      status: 'error',
-      code: HTTP_CODES.INTERNAL_SERVER_ERROR,
-      message: MESSAGES.ERROR.SOMETHING_WENT_WRONG,
-    });
+    return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG, null, RESPONSE_TAGS.SERVER.INTERNAL_SERVER_ERROR);
   }
 };
 

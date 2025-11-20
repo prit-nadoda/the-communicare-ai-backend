@@ -1,6 +1,7 @@
 const { errorResponse } = require('../helpers/response');
 const MESSAGES = require('../constants/messages');
 const HTTP_CODES = require('../constants/httpCodes');
+const RESPONSE_TAGS = require('../constants/responseTags');
 const { ROLES, ROLE_HIERARCHY } = require('../constants/roles');
 const logger = require('../helpers/logger');
 
@@ -13,7 +14,7 @@ const authorize = (allowedRoles) => {
     try {
       // Check if user is authenticated
       if (!req.user) {
-        return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED);
+        return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED, null, RESPONSE_TAGS.AUTH.UNAUTHORIZED);
       }
 
       // Convert single role to array
@@ -24,14 +25,14 @@ const authorize = (allowedRoles) => {
 
       if (!hasRole) {
         logger.warn(`Access denied for user ${req.user.userId} with role ${req.user.role}`);
-        return errorResponse(res, HTTP_CODES.FORBIDDEN, MESSAGES.ERROR.INSUFFICIENT_PERMISSIONS);
+        return errorResponse(res, HTTP_CODES.FORBIDDEN, MESSAGES.ERROR.INSUFFICIENT_PERMISSIONS, null, RESPONSE_TAGS.AUTH.INSUFFICIENT_PERMISSIONS);
       }
 
       logger.info(`Access granted for user ${req.user.userId} with role ${req.user.role}`);
       next();
     } catch (error) {
       logger.error('RBAC middleware error:', error);
-      return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG);
+      return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG, null, RESPONSE_TAGS.SERVER.INTERNAL_SERVER_ERROR);
     }
   };
 };
@@ -45,7 +46,7 @@ const requireMinimumRole = (minimumRole) => {
     try {
       // Check if user is authenticated
       if (!req.user) {
-        return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED);
+        return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED, null, RESPONSE_TAGS.AUTH.UNAUTHORIZED);
       }
 
       const userRoleLevel = ROLE_HIERARCHY[req.user.role] || 0;
@@ -53,14 +54,14 @@ const requireMinimumRole = (minimumRole) => {
 
       if (userRoleLevel < requiredRoleLevel) {
         logger.warn(`Access denied for user ${req.user.userId} with role ${req.user.role} (required: ${minimumRole})`);
-        return errorResponse(res, HTTP_CODES.FORBIDDEN, MESSAGES.ERROR.INSUFFICIENT_PERMISSIONS);
+        return errorResponse(res, HTTP_CODES.FORBIDDEN, MESSAGES.ERROR.INSUFFICIENT_PERMISSIONS, null, RESPONSE_TAGS.AUTH.INSUFFICIENT_PERMISSIONS);
       }
 
       logger.info(`Access granted for user ${req.user.userId} with role ${req.user.role} (minimum required: ${minimumRole})`);
       next();
     } catch (error) {
       logger.error('Minimum role middleware error:', error);
-      return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG);
+      return errorResponse(res, HTTP_CODES.INTERNAL_SERVER_ERROR, MESSAGES.ERROR.SOMETHING_WENT_WRONG, null, RESPONSE_TAGS.SERVER.INTERNAL_SERVER_ERROR);
     }
   };
 };

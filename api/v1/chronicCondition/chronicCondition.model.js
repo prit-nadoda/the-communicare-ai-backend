@@ -21,6 +21,10 @@ const chronicConditionSchema = new mongoose.Schema({
     sparse: true,
     unique: true,
   },
+  image: {
+    type: String,
+    default: null,
+  },
   isActive: {
     type: Boolean,
     default: true,

@@ -1,7 +1,8 @@
 const User = require('./user.model');
+const Patient = require('../patient/patient.model');
 const { generateTokens, verifyRefreshToken } = require('../../../helpers/token');
 const MESSAGES = require('../../../constants/messages');
-const ROLES = require('../../../constants/roles');
+const { ROLES } = require('../../../constants/roles');
 const RESPONSE_TAGS = require('../../../constants/responseTags');
 const { createNotFoundError, createConflictError, createUnauthorizedError } = require('../../../middlewares/error.middleware');
 const logger = require('../../../helpers/logger');
@@ -316,6 +317,68 @@ const userService = {
       logger.info(`Password changed for user: ${user.email}`);
     } catch (error) {
       logger.error('Error changing password:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Update user profile (role-based)
+   * Updates user details and patient details if user is a patient
+   * @param {string} userId - User ID
+   * @param {Object} profileData - Profile update data
+   * @returns {Object} - Updated user with patient data if applicable
+   */
+  async updateProfile(userId, profileData) {
+    try {
+      const user = await User.findById(userId);
+      if (!user) {
+        throw createNotFoundError(MESSAGES.ERROR.USER_NOT_FOUND, RESPONSE_TAGS.RESOURCE.USER_NOT_FOUND);
+      }
+
+      // Extract user-specific fields
+      const { name, avatar, birthDate, gender, contact, chronicConditions, allergies, emergencyContact, medicalHistory } = profileData;
+
+      // Update user fields
+      if (name) user.name = name;
+      if (avatar) user.avatar = avatar;
+      await user.save();
+
+      // If user is a patient, update patient details
+      let patientData = null;
+      if (user.role === ROLES.PATIENT) {
+        const patient = await Patient.findOne({ user: userId });
+        
+        if (patient) {
+          // Update patient fields if provided
+          if (birthDate) patient.birthDate = birthDate;
+          if (gender) patient.gender = gender;
+          if (contact) patient.contact = contact;
+          if (chronicConditions) patient.chronicConditions = chronicConditions;
+          if (allergies) patient.allergies = allergies;
+          if (emergencyContact) patient.emergencyContact = emergencyContact;
+          if (medicalHistory) patient.medicalHistory = medicalHistory;
+          
+          await patient.save();
+          
+          // Populate patient data
+          await patient.populate('chronicConditions');
+          await patient.populate('allergies');
+          patientData = patient;
+        }
+      }
+
+      // Remove password from response
+      const userResponse = user.toObject();
+      delete userResponse.password;
+
+      logger.info(`Profile updated for user: ${user.email}`);
+      
+      return {
+        user: userResponse,
+        patient: patientData,
+      };
+    } catch (error) {
+      logger.error('Error updating profile:', error);
       throw error;
     }
   },

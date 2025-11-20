@@ -2,6 +2,7 @@ const { verifyAccessToken } = require('../helpers/token');
 const { errorResponse } = require('../helpers/response');
 const MESSAGES = require('../constants/messages');
 const HTTP_CODES = require('../constants/httpCodes');
+const RESPONSE_TAGS = require('../constants/responseTags');
 const { ROLES } = require('../constants/roles');
 const logger = require('../helpers/logger');
 const Patient = require('../api/v1/patient/patient.model');
@@ -15,13 +16,13 @@ const authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_MISSING);
+      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_MISSING, null, RESPONSE_TAGS.AUTH.TOKEN_MISSING);
     }
 
     const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     if (!token) {
-      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_MISSING);
+      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_MISSING, null, RESPONSE_TAGS.AUTH.TOKEN_MISSING);
     }
 
     // Verify token
@@ -48,14 +49,14 @@ const authenticate = async (req, res, next) => {
     logger.error('Authentication error:', error);
     
     if (error.name === 'TokenExpiredError') {
-      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_EXPIRED);
+      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_EXPIRED, null, RESPONSE_TAGS.AUTH.TOKEN_EXPIRED);
     }
     
     if (error.name === 'JsonWebTokenError') {
-      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_INVALID);
+      return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.TOKEN_INVALID, null, RESPONSE_TAGS.AUTH.TOKEN_INVALID);
     }
     
-    return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED);
+    return errorResponse(res, HTTP_CODES.UNAUTHORIZED, MESSAGES.ERROR.UNAUTHORIZED, null, RESPONSE_TAGS.AUTH.UNAUTHORIZED);
   }
 };
 

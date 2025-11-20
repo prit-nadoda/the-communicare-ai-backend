@@ -21,6 +21,10 @@ const allergySchema = new mongoose.Schema({
     sparse: true,
     unique: true,
   },
+  image: {
+    type: String,
+    default: null,
+  },
   category: {
     type: String,
     enum: ['food', 'medication', 'environmental', 'other'],

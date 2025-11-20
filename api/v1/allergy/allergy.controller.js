@@ -4,6 +4,7 @@ const MESSAGES = require('../../../constants/messages');
 const HTTP_CODES = require('../../../constants/httpCodes');
 const RESPONSE_TAGS = require('../../../constants/responseTags');
 const { asyncHandler } = require('../../../middlewares/error.middleware');
+const { getFileUrl } = require('../../../helpers/uploader');
 const logger = require('../../../helpers/logger');
 
 /**
@@ -16,6 +17,12 @@ const allergyController = {
    */
   createAllergy: asyncHandler(async (req, res) => {
     const allergyData = req.body;
+    
+    // Add image URL if file was uploaded
+    if (req.file) {
+      allergyData.image = getFileUrl(req.file.filename);
+    }
+    
     const allergy = await allergyService.createAllergy(allergyData);
     
     logger.info('Allergy created successfully');
@@ -78,6 +85,11 @@ const allergyController = {
   updateAllergy: asyncHandler(async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
+    
+    // Add image URL if file was uploaded
+    if (req.file) {
+      updateData.image = getFileUrl(req.file.filename);
+    }
     
     const allergy = await allergyService.updateAllergy(id, updateData);
     

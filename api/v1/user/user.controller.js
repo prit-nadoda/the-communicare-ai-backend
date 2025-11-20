@@ -4,6 +4,7 @@ const MESSAGES = require('../../../constants/messages');
 const HTTP_CODES = require('../../../constants/httpCodes');
 const RESPONSE_TAGS = require('../../../constants/responseTags');
 const { asyncHandler } = require('../../../middlewares/error.middleware');
+const { getFileUrl } = require('../../../helpers/uploader');
 const logger = require('../../../helpers/logger');
 
 /**
@@ -49,17 +50,22 @@ const userController = {
   }),
 
   /**
-   * Update current user profile
+   * Update current user profile (role-based)
    * PUT /api/v1/user/profile
    */
   updateProfile: asyncHandler(async (req, res) => {
     const userId = req.user.userId;
     const updateData = req.body;
     
-    const user = await userService.updateUser(userId, updateData);
+    // Add avatar URL if file was uploaded
+    if (req.file) {
+      updateData.avatar = getFileUrl(req.file.filename);
+    }
     
-    logger.info(`Profile updated: ${user.email}`);
-    return successResponse(res, HTTP_CODES.OK, MESSAGES.SUCCESS.USER_UPDATED, user, RESPONSE_TAGS.SUCCESS.USER_UPDATED);
+    const result = await userService.updateProfile(userId, updateData);
+    
+    logger.info(`Profile updated: ${result.user.email}`);
+    return successResponse(res, HTTP_CODES.OK, 'Profile updated successfully', result, RESPONSE_TAGS.SUCCESS.USER_UPDATED);
   }),
 
   /**

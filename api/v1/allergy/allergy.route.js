@@ -5,6 +5,7 @@ const { validateBody, validateParams, validateQuery } = require('../../../middle
 const { authenticate } = require('../../../middlewares/auth.middleware');
 const { requireAdmin } = require('../../../middlewares/rbac.middleware');
 const { paginationMiddleware, filterMiddleware, searchMiddleware } = require('../../../middlewares/pagination.middleware');
+const { uploadSingle } = require('../../../helpers/uploader');
 
 const router = express.Router();
 
@@ -28,6 +29,7 @@ router.get('/:id',
 // Admin-only routes (CUD operations)
 router.post('/', 
   requireAdmin,
+  uploadSingle('image'),
   validateBody(allergyValidation.createAllergySchema),
   allergyController.createAllergy
 );
@@ -35,6 +37,7 @@ router.post('/',
 router.put('/:id', 
   requireAdmin,
   validateParams(allergyValidation.allergyIdParamSchema),
+  uploadSingle('image'),
   validateBody(allergyValidation.updateAllergySchema),
   allergyController.updateAllergy
 );

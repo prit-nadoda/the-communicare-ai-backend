@@ -76,12 +76,24 @@ const uploadFields = (fields) => {
 
 /**
  * Get file URL
- * @param {string} filename - File name
- * @returns {string} - File URL
+ * @param {string} filename - File name or full URL
+ * @returns {string} - Full file URL with API base
  */
 const getFileUrl = (filename) => {
   if (!filename) return null;
-  return `/uploads/${filename}`;
+  
+  // If already a full URL, return as is
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
+  }
+  
+  // If already includes /uploads/, just prepend API_URL
+  if (filename.startsWith('/uploads/')) {
+    return `${config.apiUrl}${filename}`;
+  }
+  
+  // Otherwise, construct full URL
+  return `${config.apiUrl}/uploads/${filename}`;
 };
 
 /**

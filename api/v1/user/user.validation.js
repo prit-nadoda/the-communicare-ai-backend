@@ -89,6 +89,33 @@ const userIdParamSchema = Joi.object({
   userId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).required(),
 });
 
+// Profile update schema (logged-in user updates their own profile)
+const updateProfileSchema = Joi.object({
+  name: commonSchemas.name.optional(),
+  // Patient-specific fields (from patient.validation.js)
+  birthDate: Joi.string().isoDate().optional()
+    .messages({
+      'string.isoDate': 'Birth date must be in ISO format (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss.sssZ)',
+    }),
+  gender: Joi.string().valid('male', 'female', 'other').optional(),
+  contact: Joi.object({
+    country: Joi.string().length(2).uppercase().optional(),
+    countryCode: Joi.string().pattern(/^\+?\d{1,4}$/).optional(),
+    phone: Joi.string().pattern(/^\d+$/).optional(),
+    email: Joi.string().email().optional(),
+  }).optional(),
+  chronicConditions: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)).optional(),
+  allergies: Joi.array().items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/)).optional(),
+  emergencyContact: Joi.object({
+    name: Joi.string().optional(),
+    relationship: Joi.string().optional(),
+    country: Joi.string().length(2).uppercase().optional(),
+    countryCode: Joi.string().pattern(/^\+?\d{1,4}$/).optional(),
+    phone: Joi.string().pattern(/^\d+$/).optional(),
+  }).optional(),
+  medicalHistory: Joi.string().optional(),
+}).min(1);
+
 module.exports = {
   registerSchema,
   loginSchema,
@@ -100,4 +127,5 @@ module.exports = {
   resetPasswordSchema,
   userQuerySchema,
   userIdParamSchema,
+  updateProfileSchema,
 }; 

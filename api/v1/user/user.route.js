@@ -5,6 +5,7 @@ const { validateBody, validateParams, validateQuery } = require('../../../middle
 const { authenticate } = require('../../../middlewares/auth.middleware');
 const { authorize, requireAdmin } = require('../../../middlewares/rbac.middleware');
 const { paginationMiddleware, filterMiddleware, searchMiddleware } = require('../../../middlewares/pagination.middleware');
+const { uploadSingle } = require('../../../helpers/uploader');
 
 const router = express.Router();
 
@@ -17,7 +18,11 @@ router.use(authenticate); // Apply authentication to all routes below
 
 // User profile routes
 router.get('/profile', userController.getProfile);
-router.put('/profile', validateBody(userValidation.partialUpdateUserSchema), userController.updateProfile);
+router.put('/profile', 
+  uploadSingle('avatar'),
+  validateBody(userValidation.updateProfileSchema),
+  userController.updateProfile
+);
 router.post('/change-password', validateBody(userValidation.changePasswordSchema), userController.changePassword);
 
 
