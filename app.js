@@ -20,6 +20,7 @@ const patientRoutes = require('./api/v1/patient/patient.route');
 const chronicConditionRoutes = require('./api/v1/chronicCondition/chronicCondition.route');
 const allergyRoutes = require('./api/v1/allergy/allergy.route');
 const healthConcernRoutes = require('./api/v1/healthConcern/healthConcern.route');
+const assessmentRoutes = require('./api/v1/assessment/assessment.route');
 
 // Create Express app
 const app = express();
@@ -98,6 +99,7 @@ app.use('/api/v1/patient', patientRoutes);
 app.use('/api/v1/chronic-condition', chronicConditionRoutes);
 app.use('/api/v1/allergy', allergyRoutes);
 app.use('/api/v1/health-concern', healthConcernRoutes);
+app.use('/api/v1/assessment', assessmentRoutes);
 
 // Swagger documentation
 try {
