@@ -43,6 +43,26 @@ const config = {
   logging: {
     level: process.env.LOG_LEVEL || 'info',
   },
+
+  // LLM Configuration (multi-provider support)
+  llm: {
+    openai: {
+      apiKey: process.env.OPENAI_API_KEY || '',
+      // gpt-5.1: Newest flagship model, best for coding and agentic tasks
+      // Perfect for structured outputs, schema adherence, and reasoning
+      // NOTE: gpt-5.1 uses FIXED temperature of 1.0 (not configurable)
+      // NOTE: gpt-5.1 uses reasoning tokens - actual limit is 4x this for output
+      model: process.env.OPENAI_MODEL || 'gpt-5.1',
+      maxTokens: parseInt(process.env.OPENAI_MAX_TOKENS, 10) || 8192,
+      temperature: parseFloat(process.env.OPENAI_TEMPERATURE) || 1.0,
+      // Reasoning effort for gpt-5.1 (low/medium/high)
+      reasoningEffort: process.env.OPENAI_REASONING_EFFORT || 'medium',
+    },
+    // Future providers can be added here
+    // perplexity: {
+    //   apiKey: process.env.PERPLEXITY_API_KEY || '',
+    // },
+  },
 };
 
 module.exports = config; 
